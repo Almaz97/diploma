@@ -1,20 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from user.models import User
 from django.core.validators import MinValueValidator
-
-
-class Employee(models.Model):
-    class Meta:
-        db_table = 'employee'
-
-    POSITION = [
-        ('commission', 'Commission'),
-        ('secretary', 'Secretary'),
-        ('hr', 'HR')
-    ]
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    position = models.CharField(max_length=25, choices=POSITION)
 
 
 class Contest(models.Model):
@@ -25,7 +12,7 @@ class Contest(models.Model):
     image = models.ImageField(null=True, blank=True)
     date = models.DateTimeField()
     description = models.TextField()
-    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True)
+    employee = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -51,7 +38,7 @@ class ContestCommission(models.Model):
     class Meta:
         db_table = 'contest_commission'
 
-    commission = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='commissions')
+    commission = models.ForeignKey(User, on_delete=models.CASCADE, related_name='commissions')
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
 
 
@@ -61,5 +48,5 @@ class ContestSummary(models.Model):
 
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='summaries')
     contestant = models.ForeignKey(Contestant, on_delete=models.CASCADE, related_name='summaries')
-    commission = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='summaries')
+    commission = models.ForeignKey(User, on_delete=models.CASCADE, related_name='summaries')
     comment = models.TextField()

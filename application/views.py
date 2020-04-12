@@ -1,6 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
+from contestant.models import Contest
+
 
 def homepage(request):
-    return render(request, 'home.html')
+    context = {
+        'contests': Contest.objects.all()
+    }
+    return render(request, 'home.html', context)

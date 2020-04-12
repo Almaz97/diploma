@@ -1,6 +1,7 @@
 from django.db import models
 
-from contestant.models import Contest, Employee, Contestant
+from contestant.models import Contest, Contestant
+from user.models import User
 
 
 class Application(models.Model):
@@ -9,7 +10,7 @@ class Application(models.Model):
 
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
     contestant = models.ForeignKey(Contestant, on_delete=models.CASCADE)
-    checked_by = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True)
+    checked_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     required_document = models.FileField()
     checked = models.BooleanField(default=False)
 
