@@ -7,7 +7,7 @@
             <div class="article-metadata">
               <small class="text-muted">Дата конкурса {{ contest.date }}</small>
             </div>
-            <h2><a class="article-title" href="#">{{ contest.name }}</a></h2>
+            <h2><a class="article-title" href="{% url 'contestant-detail' contest.id %}">{{ contest.name }}</a></h2>
             <p class="article-content">{{ contest.description }}</p>
           </div>
         </article>
