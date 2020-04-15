@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from PIL import Image
 
 
 class UserManager(BaseUserManager):
@@ -12,12 +13,11 @@ class UserManager(BaseUserManager):
 
         if not password:
             raise ValueError('User must have a password')
-
-        user = self.model(email=self.normalize_email(email))
+        user = self.model(email=self.normalize_email(email), full_name=full_name)
         user.set_password(password)
         user.staff = is_staff
         user.admin = is_admin
-        user.save(using=self._db)
+        user.save()
         return user
 
     def create_staffuser(self, email, password):
@@ -42,7 +42,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(unique=True, max_length=255)
     full_name = models.CharField(max_length=255)
     position = models.CharField(max_length=25, choices=POSITION)
-    image = models.ImageField(upload_to='employee_pics', null=True, blank=True)
+    image = models.ImageField(default='employee_pics/default.jpg', upload_to='employee_pics')
     active = models.BooleanField(default=True)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
@@ -63,6 +63,14 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        img = Image.open(self.image.path)
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.image.path)
 
     @property
     def is_staff(self):
