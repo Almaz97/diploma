@@ -1,13 +1,18 @@
 {% extends "layout.html" %}
-
+{% load i18n %}
 {% block content %}
     <article class="media content-section">
       <div class="media-body">
         <div class="article-metadata">
-          <small class="text-muted">Дата конкурса {{ object.date }}</small>
+            {% language 'ru' %}
+          <small class="text-muted">Дата и время конкурса: {{ object.date }}</small>
+            {% endlanguage %}
         </div>
-        <h2 class="article-title">{{ object.name }}</h2>
-        <p class="article-content">{{ object.description }}</p>
+        <h2 class="article-title">Конкурс: {{ object.name }}</h2>
+        <p class="article-content">Описание: {{ object.description }}</p>
+        <p class="article-content">На должность: {{ object.vacancy_position }}</p>
+        <p class="article-content">Список требуемых документов: <a class="btn btn-primary stretched-link" href="{{ object.required_documents.url }}" download>Скачать</a></p>
+          <a href="{% url 'application' object.id%}">Подать заявку</a>
       </div>
     </article>
 {% endblock content %}

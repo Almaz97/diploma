@@ -1,11 +1,13 @@
 {% extends "layout.html" %}
-
+{% load i18n %}
 {% block content %}
     {% for contest in contests %}
         <article class="media content-section">
           <div class="media-body">
             <div class="article-metadata">
-              <small class="text-muted">Дата конкурса {{ contest.date }}</small>
+                {% language 'ru' %}
+              <small class="text-muted">Дата и время конкурса: {{ contest.date}}</small>
+                {% endlanguage %}
             </div>
             <h2><a class="article-title" href="{% url 'contestant-detail' contest.id %}">{{ contest.name }}</a></h2>
             <p class="article-content">{{ contest.description }}</p>

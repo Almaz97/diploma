@@ -4,6 +4,16 @@ from user.models import User
 from django.core.validators import MinValueValidator
 
 
+class VacancyPosition(models.Model):
+    class Meta:
+        db_table = 'vacancy_position'
+
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class Contest(models.Model):
     class Meta:
         db_table = 'contest'
@@ -12,18 +22,27 @@ class Contest(models.Model):
     image = models.ImageField(null=True, blank=True)
     date = models.DateTimeField()
     description = models.TextField()
-    employee = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    vacancy_position = models.ForeignKey(VacancyPosition, on_delete=models.PROTECT)
+    required_documents = models.FileField(default='contest_docs/trebuyemiye_documenti.docx')
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Contestant(models.Model):
     class Meta:
         db_table = 'contestant'
 
-    first_name = models.CharField(max_length=50)
-    second_name = models.CharField(max_length=50)
-    age = models.IntegerField(validators=[MinValueValidator(0)])
-    photo = models.ImageField()
+    full_name = models.CharField(max_length=50)
+    email = models.EmailField(unique=True, max_length=255)
+    address = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20)
+    documents = models.FileField(upload_to='contestant_docs')
+
+    def __str__(self):
+        return self.full_name
 
 
 class ContestParticipant(models.Model):

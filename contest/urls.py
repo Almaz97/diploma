@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from application.views import homepage
-from contestant.views import ContestListView, ContestDetailView
+from contestant.views import ContestListView, ContestDetailView, application
 from user.views import profile
 from django.contrib.auth import views as auth_views
 from django.conf import settings
@@ -29,6 +29,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(redirect_authenticated_user=True, template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
     path('profile/', profile, name='profile'),
+    path('contests/<int:pk>/application/', application, name='application'),
 ]
 
 if settings.DEBUG:
