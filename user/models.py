@@ -81,5 +81,26 @@ class User(AbstractBaseUser):
         return self.admin
 
     @property
-    def is_avtive(self):
+    def is_active(self):
         return self.active
+
+    @property
+    def is_secretary(self):
+        if self.position == 'secretary':
+            return True
+        else:
+            return False
+
+    @property
+    def is_commission(self):
+        if self.position == 'commission':
+            return True
+        else:
+            return False
+
+    @property
+    def is_hr(self):
+        if self.position == 'hr':
+            return True
+        else:
+            return False
