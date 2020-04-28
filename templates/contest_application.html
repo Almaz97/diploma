@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+{% load i18n %}
+{% block main %}
+    <main role="main" class="container">
+      <div class="row">
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                  </div>
+              {% endfor %}
+          {% endif %}
+          {% block content %}
+               <div class="container mb-3 mt-3">
+        <h2>Заявки на конкурс: {{ contest.name }}</h2>
+            <table class="table table-striped table-bordered joealdkajdke" style="width: 100%" id="mydatatable">
+                <thead>
+                    <tr>
+                        <th>ФИО</th>
+                        <th>Email</th>
+                        <th>Номер</th>
+                        <th class="text-center">Документы</th>
+                        <th class="text-center">На отбор</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for application in contest_applications %}
+                        <tr id="row_{{ application.id }}">
+                            <td class="align-middle">{{ application.contestant.full_name }}</td>
+                            <td class="align-middle">{{ application.contestant.email }}</td>
+                            <td class="align-middle">{{ application.contestant.phone_number }}</td>
+                            <td class="text-center"><a class="btn btn-info" href="{{ application.contestant.documents.url }}" download>Скачать</td>
+                            <td class="text-center"><a type="button" onclick="saveRowId(this.closest('tr').id, {{ contest.id }})" id="confirmApplication_1" class="btn btn-warning" data-toggle="modal" data-target="#exampleModalCenter" >Подтвердить</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">
+                    Допуская конкурсанта на отбор Вы подтверждаете, что конкурсант предоставил все необходимые данные и документы для участия в конкурсе?
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-primary" href="#" id="confirmApplication">Да, подтверждаю</button>
+              </div>
+            </div>
+          </div>
+        </div>
+          {% endblock content %}
+
+      </div>
+    </main>
+
+{% endblock main %}
+{% block javascript %}
+      <script>
+    // AJAX POST
+    $('#confirmApplication').click(function(){
+        const url = window.location.pathname
+        alert(url)
+        $.ajax({
+            type: "POST",
+            url: url,
+            contentType: "application/json",
+            dataType: "json",
+            data: {"item": "test item"},
+            headers: { "X-CSRFToken": "{{ csrf_token }}" },
+            success: function(data) {
+                alert(data.message)
+            }
+        })
+    })
+  </script>
+{% endblock javascript %}
+
+{#{% block sidebar %}#}
+{#{% endblock %}#}

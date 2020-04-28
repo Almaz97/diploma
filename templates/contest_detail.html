@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% load i18n %}
+{% load crispy_forms_tags %}
 {% block content %}
     <article class="media content-section">
       <div class="media-body">
@@ -12,7 +13,24 @@
         <p class="article-content">Описание: {{ object.description }}</p>
         <p class="article-content">На должность: {{ object.vacancy_position }}</p>
         <p class="article-content">Список требуемых документов: <a class="btn btn-primary stretched-link" href="{{ object.required_documents.url }}" download>Скачать</a></p>
-          <a href="{% url 'application' object.id%}">Подать заявку</a>
+          {% if user.is_secretary %}
+            <a class="btn btn-primary stretched-link" href="{% url 'contest-applications' object.id %}">Просмотр всех заявок</a>
+          {% else %}
+{#            <a class="btn btn-primary" data-toggle="collapse" href="{% url 'application' object.id%}">Подать заявку</a>#}
+            <a class="btn btn-outline-info" data-toggle="collapse" href="#multiCollapseExample1" aria-expanded="false" aria-controls="multiCollapseExample1">Открыть форму заявки</a>
+              <p></p>
+            <form method="POST" enctype="multipart/form-data" id="multiCollapseExample1" class="collapse multi-collapse">
+              {% csrf_token %}
+              <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Заполните форму заявки</legend>
+                  {{ a_form|crispy }}
+              </fieldset>
+              <div class="form-group">
+                  <button class="btn btn-outline-info" type="submit">Отправить заявку</button>
+              </div>
+            </form>
+          {% endif %}
+
       </div>
     </article>
 {% endblock content %}
