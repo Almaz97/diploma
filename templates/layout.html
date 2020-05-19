@@ -38,7 +38,7 @@
                     {% if user.is_secretary %}
                         <a class="nav-item nav-link" href="#">Заявки</a>
                     {% elif user.is_commission %}
-                        <a class="nav-item nav-link" href="{% url 'contestant-home' %}">Конкурсы</a>
+                        <a class="nav-item nav-link" href="{% url 'commission-contests' user.id %}">Конкурсы где Вы находитесь в составе комиссии</a>
                     {% endif %}
                     <a class="nav-item nav-link" href="{% url 'profile' %}">Профиль</a>
                     <a class="nav-item nav-link" href="{% url 'logout' %}">Выйти</a>

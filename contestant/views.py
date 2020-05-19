@@ -1,11 +1,14 @@
+from django.conf import settings
 from django.http import JsonResponse
+import json
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 
 from .forms import ContestantForm
-from .models import Contest
+from .models import Contest, ContestCommission
 from application.models import Application
 from django.contrib import messages
+from django.core.mail import send_mail
 
 
 class ContestListView(ListView):
@@ -60,10 +63,34 @@ def application(request, pk):
 def contest_application(request, pk):
 
     if request.is_ajax and request.method == "POST":
-
+        data = json.loads(request.body)
+        application_id = data['application']
+        contest_id = data['contest']
+        confirmed = data['confirmed']
+        applic = Application.objects.get(id=int(application_id))
+        applic.checked = True
+        applic.checked_by = request.user
+        if confirmed:
+            applic.confirmed = True
+            message = 'Ваша заявка было рассмотрено. Мы рады сообщить Вам, что Вы допущены на отбор.'
+        else:
+            applic.confirmed = False
+            message = 'Ваша заявка было рассмотрено. Вы не добущены на отбор. '
+            reject_reason = data.get('message', None)
+            if reject_reason:
+                message += str(reject_reason)
+        print('message')
+        applic.save()
+        subject = 'КГТУ им. Раззакова. Заявка на конкурс'
+        from_email = settings.EMAIL_HOST_USER
+        to_list = [applic.contestant.email]
+        send_mail(subject, message, from_email, to_list, fail_silently=True)
         return JsonResponse({'message': 'success'})
 
     contest_applications = Application.objects.filter(contest__id=pk)
+    if request.user.is_commission:
+        contest_applications = contest_applications.filter(checked=True)
+
     contest = contest_applications[0].contest
     context = {
         'contest': contest,
@@ -74,3 +101,32 @@ def contest_application(request, pk):
 
 def contest_application_update(request, pk):
     return redirect('contest-applications')
+
+
+def commission_contests(request, pk):
+    c_contests = ContestCommission.objects.filter(commission_id=pk).select_related('contest')
+    contests = [c_contest.contest for c_contest in c_contests]
+    context = {
+        'contests': contests
+    }
+    return render(request, 'home.html', context=context)
+
+
+def contest_review(request, pk_1, pk_2):
+    application = Application.objects.filter(pk=pk_2).first()
+    contestant = application.contestant
+    context = {
+        'application': application
+    }
+    return render(request, 'contest_review.html', context=context)
+
+
+def contest_result(request, pk):
+    contest_applications = Application.objects.filter(contest__id=pk)
+
+    contest = contest_applications[0].contest
+    context = {
+        'contest': contest,
+        'contest_applications': contest_applications
+    }
+    return render(request, 'contest_result.html', context=context)

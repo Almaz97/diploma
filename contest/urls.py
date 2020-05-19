@@ -16,7 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from application.views import homepage
-from contestant.views import ContestListView, contest_detail, application, contest_application, contest_application_update
+from contestant.views import (ContestListView, contest_detail, application, contest_application,
+                              contest_application_update, commission_contests, contest_review, contest_result)
 from user.views import profile
 from django.contrib.auth import views as auth_views
 from django.conf import settings
@@ -31,8 +32,12 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
     path('profile/', profile, name='profile'),
     path('contests/<int:pk>/application/', application, name='application'),
+    path('contests/<int:pk_1>/application/<int:pk_2>/review/', contest_review, name='contest-review'),
     path('contests/<int:pk>/applications/', contest_application, name='contest-applications'),
+    path('contests/<int:pk>/results/', contest_result, name='contest-result'),
     # path('contests/<int:pk>/applications/<int:pk>/', contest_application_update, name='contest-applications-update'),
+    # commission
+    path('commission/<int:pk>/', commission_contests, name='commission-contests'),
 ]
 
 if settings.DEBUG:

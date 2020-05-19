@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">ФИО: {{ application.contestant.full_name }}</li>
+      <li class="list-group-item">{{ application.contestant.email }}</li>
+      <li class="list-group-item">{{ application.contestant.phone_number }}</li>
+      <li class="list-group-item">Porta ac consectetur ac</li>
+      <li class="list-group-item">Vestibulum at eros</li>
+    </ul>
+{% endblock content %}

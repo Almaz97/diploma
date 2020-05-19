@@ -12,9 +12,11 @@
         <h2 class="article-title">Конкурс: {{ object.name }}</h2>
         <p class="article-content">Описание: {{ object.description }}</p>
         <p class="article-content">На должность: {{ object.vacancy_position }}</p>
+        <p class="article-content">Положение о конкурсе ППС КГТУ можете прочесть здесь: <a class="stretched-link" target="_blank" href="https://kstu.kg/fileadmin/user_upload/1._polozh_o_konk_pps_kgtu.pdf">ссылка</a></p>
         <p class="article-content">Список требуемых документов: <a class="btn btn-primary stretched-link" href="{{ object.required_documents.url }}" download>Скачать</a></p>
-          {% if user.is_secretary %}
+          {% if user.is_secretary or user.is_commission %}
             <a class="btn btn-primary stretched-link" href="{% url 'contest-applications' object.id %}">Просмотр всех заявок</a>
+            <a class="btn btn-primary stretched-link" href="{% url 'contest-result' object.id %}">Результаты голосования</a>
           {% else %}
 {#            <a class="btn btn-primary" data-toggle="collapse" href="{% url 'application' object.id%}">Подать заявку</a>#}
             <a class="btn btn-outline-info" data-toggle="collapse" href="#multiCollapseExample1" aria-expanded="false" aria-controls="multiCollapseExample1">Открыть форму заявки</a>

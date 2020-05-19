@@ -21,16 +21,50 @@
                         <th>Номер</th>
                         <th class="text-center">Документы</th>
                         <th class="text-center">На отбор</th>
+                        {% if user.is_commission %}
+                            <th class="text-center">Отзыв</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for application in contest_applications %}
                         <tr id="row_{{ application.id }}">
-                            <td class="align-middle">{{ application.contestant.full_name }}</td>
-                            <td class="align-middle">{{ application.contestant.email }}</td>
-                            <td class="align-middle">{{ application.contestant.phone_number }}</td>
+                            <td class="align-middle" class="full_name">{{ application.contestant.full_name }}</td>
+                            <td class="align-middle" class="email_address">{{ application.contestant.email }}</td>
+                            <td class="align-middle" class="phone_number">{{ application.contestant.phone_number }}</td>
                             <td class="text-center"><a class="btn btn-info" href="{{ application.contestant.documents.url }}" download>Скачать</td>
-                            <td class="text-center"><a type="button" onclick="saveRowId(this.closest('tr').id, {{ contest.id }})" id="confirmApplication_1" class="btn btn-warning" data-toggle="modal" data-target="#exampleModalCenter" >Подтвердить</a></td>
+                            {% if application.checked and application.confirmed is not None %}
+                                {% if application.confirmed %}
+                                    <td class="text-center"><a type="button" class="btn btn-success">Подтверждено</a></td>
+                                {% else %}
+                                    <td class="text-center"><a type="button" class="btn btn-secondary" style="color:#fff;">Отказано</a></td>
+                                {% endif %}
+                            {% else %}
+                                <td class="text-center">
+                                    <a type="button" onclick="saveRowId({{ application.id }}, {{ contest.id }})" id="confirmApplication_1" class="btn btn-warning" data-toggle="modal" data-target="#exampleModalCenter">Подтвердить</a>
+                                    <a type="button" onclick="saveRowId({{ application.id }}, {{ contest.id }})" id="rejectApplication_1" class="btn" data-toggle="modal" data-target="#exampleModalRejectCenter" style="color:#fff; background-color: tomato">Отказать</a>
+                                </td>
+                            {% endif %}
+                            {% if user.is_commission %}
+                                <td class="text-center expand-button accordion-toggle collapsed" id="accordion_{{ application.id }}" data-toggle="collapse" data-parent="#accordion_{{ application.id }}" href="#collapse_{{ application.id }}"><a class="btn btn-warning">Оставить отзыв</a></td>
+                                <tr class="hide-table-padding">
+{#                            <td></td>#}
+                            <td colspan="6">
+                            <div id="collapse_{{ application.id }}" class="collapse in p-3">
+{#                              <div class="row">#}
+{#                                <div class="col-2">label</div>#}
+{#                                <div class="col-6">value 1</div>#}
+{#                              </div>#}
+{#
+                                <textarea name="" id="" cols="100" rows="10" placeholder="Напишите отзыв здесь..."></textarea>
+
+                                <div class="row">
+                                    <div class="col-2"><a type="button" class="btn btn-warning" href="#">Сохранить</a></div>
+                                </div>
+
+                            </div></td>
+                            </tr>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -50,11 +84,34 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" href="#" id="confirmApplication">Да, подтверждаю</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="confirmApplication">Да, подтверждаю</button>
               </div>
             </div>
           </div>
         </div>
+                <!-- Modal 2 -->
+        <div class="modal fade" id="exampleModalRejectCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">
+                    Конкурсант будет уведомлен о причине отказа по почте.
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+                <div class="modal-body">
+                    <textarea name="" id="reject_reason" cols="64" rows="10" placeholder="Напишите причину отказа здесь..."></textarea>
+                </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="rejectApplication" style="color:#fff">Подтвердить отказ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
           {% endblock content %}
 
       </div>
@@ -62,20 +119,48 @@
 
 {% endblock main %}
 {% block javascript %}
-      <script>
-    // AJAX POST
+    <script>
+    // AJAX CONFIRM POST
     $('#confirmApplication').click(function(){
         const url = window.location.pathname
-        alert(url)
+
         $.ajax({
             type: "POST",
             url: url,
             contentType: "application/json",
             dataType: "json",
-            data: {"item": "test item"},
+            data: JSON.stringify({
+                "application": localStorage.getItem('currentRowId'),
+                "contest": localStorage.getItem('contestId'),
+                "confirmed": true
+            }),
             headers: { "X-CSRFToken": "{{ csrf_token }}" },
             success: function(data) {
-                alert(data.message)
+                location.reload()
+                alert('success')
+            }
+        })
+    })
+
+    // AJAX REJECT POST
+        $('#rejectApplication').click(function(){
+        const url = window.location.pathname
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
+                "application": localStorage.getItem('currentRowId'),
+                "contest": localStorage.getItem('contestId'),
+                "confirmed": false,
+                "message": $('textarea#reject_reason').val()
+            }),
+            headers: { "X-CSRFToken": "{{ csrf_token }}" },
+            success: function(data) {
+                location.reload()
+                alert('reject')
             }
         })
     })
