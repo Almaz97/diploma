@@ -12,6 +12,7 @@ class Application(models.Model):
     contestant = models.ForeignKey(Contestant, on_delete=models.CASCADE)
     checked_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     checked = models.BooleanField(default=False)
+    confirmed = models.BooleanField(null=True, blank=True)
 
     def __str__(self):
         return f'Заявка на конкурс: {self.contest.name}'
