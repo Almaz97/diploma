@@ -135,3 +135,9 @@ MEDIA_URL = '/media/'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 LOGIN_REDIRECT_URL = 'contestant-home'
 LOGIN_URL = 'login'
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'kstu.secretary'
+EMAIL_HOST_PASSWORD = 'tonotify2020'
+EMAIL_PORT = 587
