@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from application.views import homepage
-from contestant.views import (ContestListView, contest_detail, application, contest_application,
+from contestant.views import (contest, contest_detail, application, contest_application,
                               contest_application_update, commission_contests, contest_review, contest_result)
 from user.views import profile
 from django.contrib.auth import views as auth_views
@@ -25,7 +25,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('homepage/', ContestListView.as_view(), name='contestant-home'),
+    path('homepage/', contest, name='contestant-home'),
     # path('contests/<int:pk>/', ContestDetailView.as_view(), name='contestant-detail'),
     path('contests/<int:pk>/', contest_detail, name='contestant-detail'),
     path('login/', auth_views.LoginView.as_view(redirect_authenticated_user=True, template_name='login.html'), name='login'),

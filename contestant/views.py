@@ -9,14 +9,38 @@ from .models import Contest, ContestCommission
 from application.models import Application
 from django.contrib import messages
 from django.core.mail import send_mail
+import datetime
 
 
-class ContestListView(ListView):
-    model = Contest
-    template_name = 'home.html'
-    context_object_name = 'contests'
-    ordering = ['date']
+# class ContestListView(ListView):
+#     model = Contest
+#     template_name = 'home.html'
+#     context_object_name = 'contests'
+#     ordering = ['date']
 
+
+def contest(request):
+
+    contests = Contest.objects.all()
+    context = {
+        'contests': contests
+    }
+
+    if request.is_ajax and request.GET.get('date'):
+        print('working')
+        date = datetime.datetime.strptime(request.GET.get('date'), '%Y-%m-%d')
+        # data = json.loads(request.body)
+        # date = data['date']
+        # print(date)
+        contests = Contest.objects.filter(created_at__lte=date)
+        print(contests)
+        context = {
+            'contests': contests
+        }
+
+        return render(request, 'home.html', context=context)
+
+    return render(request, 'home.html', context)
 
 # class ContestDetailView(DetailView):
 #     model = Contest
@@ -37,9 +61,21 @@ def contest_detail(request, pk):
     contest = Contest.objects.get(id=pk)
     a_form = ContestantForm()
 
+    created_date = contest.created_at.date()
+    print(created_date)
+    current_date = datetime.date.today()
+    print(current_date)
+    date_difference = current_date - created_date
+    application_deadline = created_date + datetime.timedelta(days=31)
+    is_actual = True
+    if date_difference.days > 32:
+        is_actual = True
+
     context = {
         'object': contest,
-        'a_form': a_form
+        'a_form': a_form,
+        'is_actual': is_actual,
+        'application_deadline': application_deadline,
     }
     return render(request, 'contest_detail.html', context=context)
 

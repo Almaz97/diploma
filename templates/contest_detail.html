@@ -19,7 +19,14 @@
             <a class="btn btn-primary stretched-link" href="{% url 'contest-result' object.id %}">Результаты голосования</a>
           {% else %}
 {#            <a class="btn btn-primary" data-toggle="collapse" href="{% url 'application' object.id%}">Подать заявку</a>#}
-            <a class="btn btn-outline-info" data-toggle="collapse" href="#multiCollapseExample1" aria-expanded="false" aria-controls="multiCollapseExample1">Открыть форму заявки</a>
+             {% language 'ru' %}
+              {% if is_actual %}
+                  <h5>Заявки принимаются до {{ application_deadline }} включительно.</h5>
+                <a class="btn btn-outline-info" data-toggle="collapse" href="#multiCollapseExample1" aria-expanded="false" aria-controls="multiCollapseExample1">Открыть форму заявки</a>
+              {% else %}
+                    <h3>Заявки принимались до {{ application_deadline }} включительно. Срок приема заявок истек.</h3>
+              {% endif %}
+               {% endlanguage %}
               <p></p>
             <form method="POST" enctype="multipart/form-data" id="multiCollapseExample1" class="collapse multi-collapse">
               {% csrf_token %}
